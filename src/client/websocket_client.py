@@ -12,7 +12,7 @@ logger = logging.getLogger("MuseScoreMCP.Client")
 class MuseScoreClient:
     """Client to communicate with MuseScore WebSocket API."""
     
-    def __init__(self, host: str = "localhost", port: int = int(os.environ.get("MCP_MUSESCORE_PORT", "8765"))):
+    def __init__(self, host: str = "localhost", port: int = int(os.environ.get("MCP_MUSESCORE_PORT", "8790"))):
         self.uri = f"ws://{host}:{port}"
         self.websocket = None
     

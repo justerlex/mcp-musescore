@@ -11,7 +11,7 @@ import websockets
 
 async def main() -> None:
     host = os.environ.get("MCP_MUSESCORE_HOST", "localhost")
-    port = int(os.environ.get("MCP_MUSESCORE_PORT", "8765"))
+    port = int(os.environ.get("MCP_MUSESCORE_PORT", "8790"))
     uri = f"ws://{host}:{port}"
     async with websockets.connect(uri) as websocket:
         await websocket.send(json.dumps({"action": "ping", "params": {}}))

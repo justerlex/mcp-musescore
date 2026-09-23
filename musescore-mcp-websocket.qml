@@ -1544,9 +1544,9 @@ MuseScore {
     // ========================================
 
     onRun: {
-        console.log("Starting MuseScore API Server (Clean Version) on port 8765");
+        console.log("Starting MuseScore API Server (Clean Version) on port 8790");
         
-        api.websocketserver.listen(8765, function(clientId) {
+        api.websocketserver.listen(8790, function(clientId) {
             console.log("Client connected with ID: " + clientId);
             clientConnections.push(clientId);
             

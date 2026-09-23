@@ -7,7 +7,7 @@ from src.utils.lilypond_converter import json_to_lilypond
 logging.basicConfig(level=logging.INFO)
 
 async def test_websocket():
-    uri = "ws://localhost:8765"
+    uri = "ws://localhost:8790"
     try:
         async with websockets.connect(uri) as websocket:
             print("Connected to MuseScore WebSocket.")
