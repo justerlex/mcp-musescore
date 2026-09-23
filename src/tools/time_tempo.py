@@ -18,3 +18,8 @@ def setup_time_tempo_tools(mcp, client: MuseScoreClient):
             "numerator": numerator,
             "denominator": denominator
         })
+
+    @mcp.tool()
+    async def set_tempo(bpm: float = 120):
+        """Add a tempo mark (quarter = bpm) at the cursor."""
+        return await client.send_command("setTempo", {"bpm": bpm})

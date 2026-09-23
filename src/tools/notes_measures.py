@@ -8,7 +8,7 @@ def setup_notes_measures_tools(mcp, client: MuseScoreClient):
     """Setup notes and measures tools."""
     
     @mcp.tool()
-    async def add_note(pitch: int = 64, duration: dict = {"numerator": 1, "denominator": 4}, advance_cursor_after_action: bool = True, add_to_chord: bool = False):
+    async def add_note(pitch: int = 64, duration: dict = {"numerator": 1, "denominator": 4}, advance_cursor_after_action: bool = True, add_to_chord: bool = False, voice: Optional[int] = None):
         """Add a note at the current cursor position with the specified pitch and duration.
         
         Sequential notes write a melody. Set add_to_chord=True to stack a pitch on the current chord.
@@ -20,14 +20,15 @@ def setup_notes_measures_tools(mcp, client: MuseScoreClient):
             add_to_chord: If True, add this pitch to the current chord instead of writing the next melody note
         """
         return await client.send_command("addNote", {
-            "pitch": pitch, 
+            "pitch": pitch,
             "duration": duration,
             "advanceCursorAfterAction": advance_cursor_after_action,
+            **({"voice": voice} if voice is not None else {}),
             "addToChord": add_to_chord
         })
 
     @mcp.tool()
-    async def add_rest(duration: dict = {"numerator": 1, "denominator": 4}, advance_cursor_after_action: bool = True):
+    async def add_rest(duration: dict = {"numerator": 1, "denominator": 4}, advance_cursor_after_action: bool = True, voice: Optional[int] = None):
         """Add a rest at the current cursor position.
         
         Args:
@@ -36,7 +37,8 @@ def setup_notes_measures_tools(mcp, client: MuseScoreClient):
         """
         return await client.send_command("addRest", {
             "duration": duration,
-            "advanceCursorAfterAction": advance_cursor_after_action
+            "advanceCursorAfterAction": advance_cursor_after_action,
+            **({"voice": voice} if voice is not None else {}),
         })
 
     @mcp.tool()
@@ -78,11 +80,19 @@ def setup_notes_measures_tools(mcp, client: MuseScoreClient):
         return await client.send_command("appendMeasure", {"count": count})
 
     @mcp.tool()
-    async def delete_selection(measure: Optional[int] = None):
-        """Delete the current selection or specified measure."""
+    async def delete_selection(measure: Optional[int] = None, start_tick: Optional[int] = None, end_tick: Optional[int] = None,
+                               staff: Optional[int] = None, end_staff: Optional[int] = None):
+        """Delete the current selection, a bar, or an explicit tick range (notes become rests). end_staff exclusive."""
         params = {}
         if measure is not None:
             params["measure"] = measure
+        if start_tick is not None and end_tick is not None:
+            params["startTick"] = start_tick
+            params["endTick"] = end_tick
+            if staff is not None:
+                params["staff"] = staff
+            if end_staff is not None:
+                params["endStaff"] = end_staff
         return await client.send_command("deleteSelection", params)
 
     @mcp.tool()

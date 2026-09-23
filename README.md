@@ -4,6 +4,22 @@ A Model Context Protocol (MCP) server that provides programmatic control over Mu
 
 ![Demo GIF](./assets/mcp-muse.gif)
 
+> **Fork notes (justerlex, September 2026) · MuseScore Studio 4.7.5**
+>
+> This fork makes the plugin survive MuseScore Studio 4.7.5 and grows it from 26 to 44 tools. Verified on Windows 11 with 4.7.5 (build 260831071); other versions untested here.
+>
+> **Fixes**
+> - `appendMeasure` / `insertMeasure` / `deleteSelection` / `undo` called MuseScore actions from inside the plugin's own `startCmd()/endCmd()`; 4.7.5 crashes on the nested command. Append now uses `Score.appendMeasures()`, the others run outside any wrapper, and undo uses the URI action code on 4.7+.
+> - Cursors inherited the score's last input voice (`INPUT_STATE_SYNC_WITH_SCORE`), so a voice-1 entry scrambled every later walk, `getScore` included. The voice is set after positioning and defaults to 0; `add_note` / `add_rest` take an optional `voice`.
+> - A chord symbol crashed 4.7.5 when its text was set before it had a parent (`Harmony::setProperty(TEXT)` checks for a fret-diagram parent). It is added to the segment first.
+> - The API's `selectRange()` never fills MuseScore's selected-element list, so `add-slur` found no chords and `add-hairpin` stayed gated. Slurs, hairpins and ottavas select the notes as a list.
+> - The Python client no longer sends keepalive pings (a long export looked like a dead peer) and never replays a command that already reached MuseScore (the old retry ran a whole write sequence twice after one timeout). Frames up to 16 MB.
+> - Every write answers with a re-read selection instead of the cached one; `get_selection` re-reads on demand.
+>
+> **New tools** · `get_measures` (a bar range: events per staff and voice with ties and articulations, annotations, spanners, key signature) · `add_dynamic` · `add_chord_symbol` · `add_text` (staff, system, rehearsal mark, expression) · `add_tempo_mark` · `set_tempo` · `set_key_signature` · `add_articulation` · `add_tie` · `add_slur` · `add_hairpin` · `add_ottava` · `transpose` · `set_duration` · `delete_range` · `remove_annotations` · `save_score` (in place, or export to pdf / musicxml / mid / png; mscz export is refused because the plugin API cannot write it) · `get_selection`.
+>
+> **Port** · the plugin listens on **8790** here (the default 8765 is taken by another local tool on this machine). The client reads `MCP_MUSESCORE_PORT`; change `listen(...)` in the QML to match.
+
 ## Prerequisites
 
 - MuseScore 3.x or 4.x

@@ -25,5 +25,20 @@ __all__ = [
     "setTimeSignatureAction",
     "undoAction",
     "nextStaffAction",
-    "prevStaffAction"
+    "prevStaffAction",
+    "getSelectionAction",
+    "getMeasuresAction",
+    "addAnnotationAction",
+    "setKeySignatureAction",
+    "addArticulationAction",
+    "addTieAction",
+    "addSlurAction",
+    "addHairpinAction",
+    "addOttavaAction",
+    "transposeAction",
+    "setDurationAction",
+    "saveScoreAction",
+    "removeAnnotationsAction",
+    "setTempoAction",
+    "selectCustomRangeAction"
 ]

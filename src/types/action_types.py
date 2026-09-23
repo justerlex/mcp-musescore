@@ -1,6 +1,7 @@
 """TypedDict definitions for MuseScore MCP action sequences."""
 
-from typing import Dict, Any, List, Literal, NotRequired, TypedDict
+from typing import Dict, Any, List, Literal, NotRequired
+from typing_extensions import TypedDict
 
 
 class getScoreAction(TypedDict):
@@ -159,6 +160,84 @@ class prevStaffAction(TypedDict):
     params: Dict[str, Any]
 
 
+# Notation extensions (23-Sep-2026): params as in the matching tool, camelCase keys
+
+
+class getSelectionAction(TypedDict):
+    action: Literal["getSelection"]
+    params: Dict[str, Any]
+
+
+class getMeasuresAction(TypedDict):
+    action: Literal["getMeasures"]
+    params: Dict[str, Any]
+
+
+class addAnnotationAction(TypedDict):
+    action: Literal["addAnnotation"]
+    params: Dict[str, Any]
+
+
+class setKeySignatureAction(TypedDict):
+    action: Literal["setKeySignature"]
+    params: Dict[str, Any]
+
+
+class addArticulationAction(TypedDict):
+    action: Literal["addArticulation"]
+    params: Dict[str, Any]
+
+
+class addTieAction(TypedDict):
+    action: Literal["addTie"]
+    params: Dict[str, Any]
+
+
+class addSlurAction(TypedDict):
+    action: Literal["addSlur"]
+    params: Dict[str, Any]
+
+
+class addHairpinAction(TypedDict):
+    action: Literal["addHairpin"]
+    params: Dict[str, Any]
+
+
+class addOttavaAction(TypedDict):
+    action: Literal["addOttava"]
+    params: Dict[str, Any]
+
+
+class transposeAction(TypedDict):
+    action: Literal["transpose"]
+    params: Dict[str, Any]
+
+
+class setDurationAction(TypedDict):
+    action: Literal["setDuration"]
+    params: Dict[str, Any]
+
+
+class saveScoreAction(TypedDict):
+    action: Literal["saveScore"]
+    params: Dict[str, Any]
+
+
+class removeAnnotationsAction(TypedDict):
+    action: Literal["removeAnnotations"]
+    params: Dict[str, Any]
+
+
+class setTempoAction(TypedDict):
+    action: Literal["setTempo"]
+    params: Dict[str, Any]
+
+
+class selectCustomRangeAction(TypedDict):
+    action: Literal["selectCustomRange"]
+    params: Dict[str, Any]
+
+
 ActionSequence = List[
     getScoreAction | addNoteAction | addRestAction | addTupletAction | 
     addLyricsAction | addInstrumentAction | setStaffMuteAction | 
@@ -166,5 +245,6 @@ ActionSequence = List[
     getCursorInfoAction | goToMeasureAction | nextElementAction | 
     prevElementAction | selectCurrentMeasureAction | insertMeasureAction | 
     goToFinalMeasureAction | goToBeginningOfScoreAction | setTimeSignatureAction | 
-    undoAction | nextStaffAction | prevStaffAction
+    undoAction | nextStaffAction | prevStaffAction |
+    getSelectionAction | getMeasuresAction | addAnnotationAction | setKeySignatureAction | addArticulationAction | addTieAction | addSlurAction | addHairpinAction | addOttavaAction | transposeAction | setDurationAction | saveScoreAction | removeAnnotationsAction | setTempoAction | selectCustomRangeAction
 ]

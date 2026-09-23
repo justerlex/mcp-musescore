@@ -1,5 +1,6 @@
 """WebSocket client for communicating with MuseScore."""
 
+import os
 import websockets
 import json
 import logging
@@ -11,14 +12,16 @@ logger = logging.getLogger("MuseScoreMCP.Client")
 class MuseScoreClient:
     """Client to communicate with MuseScore WebSocket API."""
     
-    def __init__(self, host: str = "localhost", port: int = 8765):
+    def __init__(self, host: str = "localhost", port: int = int(os.environ.get("MCP_MUSESCORE_PORT", "8765"))):
         self.uri = f"ws://{host}:{port}"
         self.websocket = None
     
     async def connect(self):
         """Connect to the MuseScore WebSocket API."""
         try:
-            self.websocket = await websockets.connect(self.uri)
+            # No keepalive pings: a long plugin operation (exports, big dumps) must not look like a dead peer.
+            # 16 MB frames: get_score of a long piece is several MB of JSON.
+            self.websocket = await websockets.connect(self.uri, ping_interval=None, max_size=16 * 1024 * 1024)
             logger.info(f"Connected to MuseScore API at {self.uri}")
             return True
         except Exception as e:
@@ -61,15 +64,23 @@ class MuseScoreClient:
             try:
                 logger.info(f"Sending command: {payload}")
                 await self.websocket.send(payload)
+            except Exception as e:
+                # The command never reached MuseScore: safe to retry once on a fresh socket.
+                last_error = str(e)
+                logger.warning(f"Send failed (attempt {attempt + 1}/2), resetting socket: {last_error}")
+                await self._reset_socket()
+                continue
+            try:
                 response = await self.websocket.recv()
                 logger.info(f"Received response: {response}")
                 return json.loads(response)
             except Exception as e:
+                # The command DID reach MuseScore. Never replay it (a replayed write doubles the edit);
+                # drop the socket so the next call reconnects, and report.
                 last_error = str(e)
-                logger.warning(
-                    f"Send failed (attempt {attempt + 1}/2), resetting socket: {last_error}"
-                )
+                logger.warning(f"No reply after a sent command, not retrying: {last_error}")
                 await self._reset_socket()
+                return {"error": f"Command sent but no reply from MuseScore (not retried): {last_error}"}
 
         return {"error": f"Not connected to MuseScore: {last_error}"}
 
